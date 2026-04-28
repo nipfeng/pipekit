@@ -1,38 +1,45 @@
-"""Step abstraction for individual pipeline units."""
+"""Pipeline step definition."""
 
-from __future__ import annotations
-
-from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
+from pipekit.retry import RetryPolicy
 
 
-@dataclass
 class Step:
-    """Represents a single processing step in a pipeline.
+    """A single unit of work in a pipeline.
 
-    Attributes:
-        name: Human-readable identifier for the step.
-        fn: Callable that performs the step's transformation.
-        description: Optional description of what the step does.
+    Parameters
+    ----------
+    name:
+        Human-readable identifier shown in logs and reports.
+    func:
+        Callable that receives the previous step's output and returns new data.
+    retry_policy:
+        Optional :class:`RetryPolicy` applied when *func* raises.
     """
 
-    name: str
-    fn: Callable[..., Any]
-    description: Optional[str] = field(default=None)
+    def __init__(
+        self,
+        name: str,
+        func: Callable[[Any], Any],
+        retry_policy: Optional[RetryPolicy] = None,
+    ):
+        self.name = name
+        self.func = func
+        self.retry_policy = retry_policy
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
 
     def run(self, data: Any) -> Any:
-        """Execute the step's function with the provided data.
+        """Execute this step, honouring any attached retry policy."""
+        if self.retry_policy is not None:
+            return self.retry_policy.execute(self.func, data)
+        return self.func(data)
 
-        Args:
-            data: Input data passed to the step.
+    # ------------------------------------------------------------------
+    # Dunder helpers
+    # ------------------------------------------------------------------
 
-        Returns:
-            Transformed data returned by the step's function.
-
-        Raises:
-            Exception: Re-raises any exception thrown by the step function.
-        """
-        return self.fn(data)
-
-    def __repr__(self) -> str:
-        return f"Step(name={self.name!r}, description={self.description!r})"
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"Step(name={self.name!r}, retry_policy={self.retry_policy!r})"
