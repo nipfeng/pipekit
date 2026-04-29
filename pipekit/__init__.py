@@ -1,37 +1,51 @@
-"""pipekit — A lightweight Python library for composing and monitoring ETL pipelines."""
+"""pipekit – lightweight ETL pipeline composition and monitoring."""
 
-from pipekit.pipeline import Pipeline
-from pipekit.step import Step
+from __future__ import annotations
 
-__version__ = "0.1.0"
-__all__ = ["Pipeline", "Step", "get_version", "version_info"]
+from typing import Tuple
+
+__all__ = [
+    "get_version",
+    "version_info",
+    "Step",
+    "Pipeline",
+    "PipelineResult",
+    "PipelineMonitor",
+    "RetryPolicy",
+    "PipelineHooks",
+    "PipelineContext",
+    "ContextStep",
+    "ContextPipeline",
+    "ThrottlePolicy",
+    "ThrottledStep",
+    "CheckpointStore",
+    "CheckpointedPipeline",
+]
+
+_VERSION: Tuple[int, int, int] = (0, 8, 0)
+
+
+def version_info() -> Tuple[int, int, int]:
+    """Return the version as a ``(major, minor, patch)`` tuple."""
+    return _VERSION
 
 
 def get_version() -> str:
-    """Return the current version of pipekit.
-
-    Returns:
-        str: The version string in PEP 440 format (e.g. ``"0.1.0"``).
-
-    Example::
-
-        >>> import pipekit
-        >>> pipekit.get_version()
-        '0.1.0'
-    """
-    return __version__
+    """Return the version string, e.g. ``'0.8.0'``."""
+    return ".".join(str(part) for part in _VERSION)
 
 
-def version_info() -> tuple[int, ...]:
-    """Return the current version of pipekit as a tuple of integers.
-
-    Returns:
-        tuple[int, ...]: The version components as integers (e.g. ``(0, 1, 0)``).
-
-    Example::
-
-        >>> import pipekit
-        >>> pipekit.version_info()
-        (0, 1, 0)
-    """
-    return tuple(int(part) for part in __version__.split("."))
+# Lazy imports kept here so the public API is available at the top level.
+from pipekit.step import Step  # noqa: E402
+from pipekit.pipeline import Pipeline  # noqa: E402
+from pipekit.result import PipelineResult  # noqa: E402
+from pipekit.monitor import PipelineMonitor  # noqa: E402
+from pipekit.retry import RetryPolicy  # noqa: E402
+from pipekit.hooks import PipelineHooks  # noqa: E402
+from pipekit.context import PipelineContext  # noqa: E402
+from pipekit.context_step import ContextStep  # noqa: E402
+from pipekit.context_pipeline import ContextPipeline  # noqa: E402
+from pipekit.throttle import ThrottlePolicy  # noqa: E402
+from pipekit.throttled_step import ThrottledStep  # noqa: E402
+from pipekit.checkpoint import CheckpointStore  # noqa: E402
+from pipekit.checkpointed_pipeline import CheckpointedPipeline  # noqa: E402
