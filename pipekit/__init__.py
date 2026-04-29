@@ -1,51 +1,57 @@
-"""pipekit – lightweight ETL pipeline composition and monitoring."""
+"""pipekit — A lightweight Python library for composing and monitoring ETL pipelines."""
 
-from __future__ import annotations
+version_info = (0, 7, 0)
 
-from typing import Tuple
+
+def get_version() -> str:
+    """Return the current pipekit version as a string."""
+    return ".".join(str(v) for v in version_info)
+
 
 __all__ = [
     "get_version",
     "version_info",
+    # core
     "Step",
     "Pipeline",
     "PipelineResult",
+    # monitoring
     "PipelineMonitor",
+    "StepMetrics",
+    # retry
     "RetryPolicy",
+    # hooks
     "PipelineHooks",
+    # context
     "PipelineContext",
     "ContextStep",
     "ContextPipeline",
+    "ContextPipelineResult",
+    # throttle
     "ThrottlePolicy",
     "ThrottledStep",
+    # checkpoint
     "CheckpointStore",
     "CheckpointedPipeline",
+    # branching
+    "Branch",
+    "BranchingPipeline",
+    "BranchingResult",
+    "BranchStep",
 ]
 
-_VERSION: Tuple[int, int, int] = (0, 8, 0)
-
-
-def version_info() -> Tuple[int, int, int]:
-    """Return the version as a ``(major, minor, patch)`` tuple."""
-    return _VERSION
-
-
-def get_version() -> str:
-    """Return the version string, e.g. ``'0.8.0'``."""
-    return ".".join(str(part) for part in _VERSION)
-
-
-# Lazy imports kept here so the public API is available at the top level.
-from pipekit.step import Step  # noqa: E402
-from pipekit.pipeline import Pipeline  # noqa: E402
-from pipekit.result import PipelineResult  # noqa: E402
-from pipekit.monitor import PipelineMonitor  # noqa: E402
-from pipekit.retry import RetryPolicy  # noqa: E402
-from pipekit.hooks import PipelineHooks  # noqa: E402
-from pipekit.context import PipelineContext  # noqa: E402
-from pipekit.context_step import ContextStep  # noqa: E402
-from pipekit.context_pipeline import ContextPipeline  # noqa: E402
-from pipekit.throttle import ThrottlePolicy  # noqa: E402
-from pipekit.throttled_step import ThrottledStep  # noqa: E402
-from pipekit.checkpoint import CheckpointStore  # noqa: E402
-from pipekit.checkpointed_pipeline import CheckpointedPipeline  # noqa: E402
+from pipekit.step import Step
+from pipekit.pipeline import Pipeline
+from pipekit.result import PipelineResult
+from pipekit.monitor import PipelineMonitor, StepMetrics
+from pipekit.retry import RetryPolicy
+from pipekit.hooks import PipelineHooks
+from pipekit.context import PipelineContext
+from pipekit.context_step import ContextStep
+from pipekit.context_pipeline import ContextPipeline, ContextPipelineResult
+from pipekit.throttle import ThrottlePolicy
+from pipekit.throttled_step import ThrottledStep
+from pipekit.checkpoint import CheckpointStore
+from pipekit.checkpointed_pipeline import CheckpointedPipeline
+from pipekit.branching import Branch, BranchingPipeline, BranchingResult
+from pipekit.branch_step import BranchStep
