@@ -63,6 +63,12 @@ class TestTimeoutPolicyExecute:
         with pytest.raises(ValueError, match="boom"):
             policy.execute(boom, 0)
 
+    def test_timeout_error_message_contains_seconds(self):
+        """TimeoutError should mention the configured timeout duration."""
+        policy = TimeoutPolicy(seconds=0.1)
+        with pytest.raises(TimeoutError, match="0.1"):
+            policy.execute(slow, 1)
+
 
 # ---------------------------------------------------------------------------
 # TimedStep
@@ -83,3 +89,10 @@ class TestTimedStep:
         r = repr(step)
         assert "my_step" in r
         assert "TimeoutPolicy" in r
+
+    def test_run_multiple_times_succeeds(self):
+        """TimedStep should be reusable across multiple calls."""
+        step = TimedStep("double", double, TimeoutPolicy(seconds=2))
+        assert step.run(3) == 6
+        assert step.run(4) == 8
+        assert step.run(0) == 0
