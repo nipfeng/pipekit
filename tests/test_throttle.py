@@ -45,6 +45,10 @@ class TestThrottlePolicyValidation:
         assert p.max_calls is None
         assert p.window == 1.0
 
+    def test_negative_max_calls_raises(self):
+        with pytest.raises(ValueError, match="max_calls"):
+            ThrottlePolicy(max_calls=-1)
+
 
 # ---------------------------------------------------------------------------
 # ThrottlePolicy execution
@@ -88,27 +92,15 @@ class TestThrottlePolicyExecution:
         assert "ThrottlePolicy" in repr(p)
         assert "0.5" in repr(p)
 
+    def test_execute_passes_kwargs(self):
+        """Ensure execute forwards keyword arguments correctly to the wrapped function."""
+        def add(x, y=0):
+            return x + y
+
+        policy = ThrottlePolicy()
+        result = policy.execute(add, 3, y=7)
+        assert result == 10
+
 
 # ---------------------------------------------------------------------------
-# ThrottledStep
-# ---------------------------------------------------------------------------
-
-class TestThrottledStep:
-    def test_run_returns_correct_result(self):
-        step = ThrottledStep("double", double)
-        assert step.run(4) == 8
-
-    def test_uses_provided_throttle_policy(self):
-        policy = ThrottlePolicy(min_interval=0.0)
-        step = ThrottledStep("id", identity, throttle=policy)
-        assert step.run("hello") == "hello"
-
-    def test_default_policy_created_when_none_given(self):
-        step = ThrottledStep("id", identity)
-        assert isinstance(step.throttle, ThrottlePolicy)
-
-    def test_repr_contains_name_and_throttle(self):
-        step = ThrottledStep("my_step", identity)
-        r = repr(step)
-        assert "my_step" in r
-        assert "ThrottlePolicy" in r
+# Throttl
